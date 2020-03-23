@@ -25,7 +25,7 @@
     "packageName": "com.adrianbadarau.bank.products",
     "packageFolder": "com/adrianbadarau/bank/products",
     "jhipsterVersion": "6.8.0",
-    "creationTimestamp": 1584989520824,
+    "creationTimestamp": 1584993300450,
     "clientPackageManager": "npm",
     "jwtSecretKey": "YTM0MjBkYzllN2M4NTEyMGNhYjNkOGQzZGU5OTFlZjI0ZTg4OTVlNGYwZDk2ZTZhOTA3NGQ0MTE5MThlNjhjMWY1ZWQ3N2JmNzFhOThiZDMwMGRiZjk1YzYxMDMwMzU3ZTYyMWJkMTRiODdlYjdiNjI0YjMyNGRlYTQ5ZWUyN2U=",
     "embeddableLaunchScript": false,

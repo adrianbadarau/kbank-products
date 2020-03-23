@@ -1,5 +1,7 @@
 package com.adrianbadarau.bank.products.domain
 
+import java.io.Serializable
+import java.time.Instant
 import javax.persistence.CollectionTable
 import javax.persistence.Column
 import javax.persistence.ElementCollection
@@ -11,8 +13,6 @@ import javax.persistence.JoinColumn
 import javax.persistence.MapKeyColumn
 import javax.persistence.Table
 import javax.validation.constraints.NotNull
-import java.io.Serializable
-import java.time.Instant
 
 /**
  * Persist AuditEvent managed by the Spring Boot actuator.
@@ -32,14 +32,11 @@ class PersistentAuditEvent(
     @Column(nullable = false)
     var principal: String? = null,
 
-
     @Column(name = "event_date")
     var auditEventDate: Instant? = null,
 
-
     @Column(name = "event_type")
     var auditEventType: String? = null,
-
 
     @ElementCollection
     @MapKeyColumn(name = "name")

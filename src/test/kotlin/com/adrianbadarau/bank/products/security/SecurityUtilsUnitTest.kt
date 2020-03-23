@@ -1,13 +1,10 @@
 package com.adrianbadarau.bank.products.security
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
-
-import java.util.Optional
-
-import org.assertj.core.api.Assertions.assertThat
 
 /**
  * Test class for the Security Utility methods.

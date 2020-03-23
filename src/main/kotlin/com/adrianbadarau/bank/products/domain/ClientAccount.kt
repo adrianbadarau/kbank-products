@@ -1,14 +1,12 @@
 package com.adrianbadarau.bank.products.domain
 
-
-import org.hibernate.annotations.Cache
-import org.hibernate.annotations.CacheConcurrencyStrategy
-
-import javax.persistence.*
-import javax.validation.constraints.*
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.io.Serializable
 import java.math.BigDecimal
+import javax.persistence.*
+import javax.validation.constraints.*
+import org.hibernate.annotations.Cache
+import org.hibernate.annotations.CacheConcurrencyStrategy
 
 /**
  * A ClientAccount.
@@ -38,7 +36,11 @@ data class ClientAccount(
 
     @get: NotNull
     @Column(name = "user_id", nullable = false)
-    var userId: Int? = null
+    var userId: Int? = null,
+
+    @ManyToOne(optional = false) @NotNull
+    @JsonIgnoreProperties("clientAccounts")
+    var type: Product? = null
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
 ) : Serializable {
@@ -61,7 +63,6 @@ data class ClientAccount(
         ", ballance=$ballance" +
         ", userId=$userId" +
         "}"
-
 
     companion object {
         private const val serialVersionUID = 1L

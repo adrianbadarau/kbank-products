@@ -1,14 +1,10 @@
 package com.adrianbadarau.bank.products.domain
 
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import org.hibernate.annotations.Cache
-import org.hibernate.annotations.CacheConcurrencyStrategy
-
+import java.io.Serializable
 import javax.persistence.*
 import javax.validation.constraints.*
-
-import java.io.Serializable
+import org.hibernate.annotations.Cache
+import org.hibernate.annotations.CacheConcurrencyStrategy
 
 /**
  * A Product.
@@ -32,11 +28,7 @@ data class Product(
     var image: ByteArray? = null,
 
     @Column(name = "image_content_type")
-    var imageContentType: String? = null,
-
-    @ManyToOne(optional = false)    @NotNull
-    @JsonIgnoreProperties("products")
-    var type: ClientAccount? = null
+    var imageContentType: String? = null
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
 ) : Serializable {
@@ -58,7 +50,6 @@ data class Product(
         ", image='$image'" +
         ", imageContentType='$imageContentType'" +
         "}"
-
 
     companion object {
         private const val serialVersionUID = 1L

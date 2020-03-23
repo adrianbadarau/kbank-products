@@ -1,7 +1,7 @@
 package com.adrianbadarau.bank.products.web.rest.errors
 
 import io.github.jhipster.web.util.HeaderUtil
-
+import javax.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.ConcurrencyFailureException
 import org.springframework.http.ResponseEntity
@@ -15,8 +15,6 @@ import org.zalando.problem.Status
 import org.zalando.problem.spring.web.advice.ProblemHandling
 import org.zalando.problem.spring.web.advice.security.SecurityAdviceTrait
 import org.zalando.problem.violations.ConstraintViolationProblem
-
-import javax.servlet.http.HttpServletRequest
 
 private const val FIELD_ERRORS_KEY = "fieldErrors"
 private const val MESSAGE_KEY = "message"
@@ -68,7 +66,8 @@ class ExceptionTranslator : ProblemHandling, SecurityAdviceTrait {
     }
 
     override fun handleMethodArgumentNotValid(
-        ex: MethodArgumentNotValidException, request: NativeWebRequest
+        ex: MethodArgumentNotValidException,
+        request: NativeWebRequest
     ): ResponseEntity<Problem>? {
         val result = ex.bindingResult
         val fieldErrors = result.fieldErrors.map { FieldErrorVM(it.objectName.replaceFirst(Regex("DTO$"), ""), it.field, it.code) }
@@ -82,7 +81,6 @@ class ExceptionTranslator : ProblemHandling, SecurityAdviceTrait {
             .build()
         return create(ex, problem, request)
     }
-
 
     @ExceptionHandler
     fun handleBadRequestAlertException(

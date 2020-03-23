@@ -37,7 +37,16 @@
             ]
         }
     ],
-    "relationships": [],
+    "relationships": [
+        {
+            "relationshipType": "many-to-one",
+            "otherEntityName": "product",
+            "otherEntityRelationshipName": "clientAccount",
+            "relationshipValidateRules": "required",
+            "relationshipName": "type",
+            "otherEntityField": "name"
+        }
+    ],
     "changelogDate": "20200323185400",
     "entityTableName": "client_account",
     "dto": "no",

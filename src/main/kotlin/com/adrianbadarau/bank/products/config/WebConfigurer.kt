@@ -3,22 +3,16 @@ package com.adrianbadarau.bank.products.config
 import io.github.jhipster.config.JHipsterConstants
 import io.github.jhipster.config.JHipsterProperties
 import io.github.jhipster.config.h2.H2ConfigurationHelper
+import javax.servlet.ServletContext
+import javax.servlet.ServletException
 import org.slf4j.LoggerFactory
-import org.springframework.boot.web.server.MimeMappings
-import org.springframework.boot.web.server.WebServerFactory
-import org.springframework.boot.web.server.WebServerFactoryCustomizer
 import org.springframework.boot.web.servlet.ServletContextInitializer
-import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
 import org.springframework.core.env.Profiles
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.filter.CorsFilter
-
-import javax.servlet.DispatcherType
-import javax.servlet.ServletContext
-import javax.servlet.ServletException
 
 /**
  * Configuration of web application with Servlet 3.0 APIs.

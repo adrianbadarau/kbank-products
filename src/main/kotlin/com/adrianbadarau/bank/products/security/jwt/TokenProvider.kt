@@ -1,10 +1,15 @@
 package com.adrianbadarau.bank.products.security.jwt
 
+import io.github.jhipster.config.JHipsterProperties
+import io.jsonwebtoken.JwtException
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.io.Decoders
+import io.jsonwebtoken.security.Keys
 import java.nio.charset.StandardCharsets
 import java.security.Key
 import java.util.Date
 import javax.annotation.PostConstruct
-
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -12,13 +17,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.stereotype.Component
 import org.springframework.util.StringUtils
-
-import io.github.jhipster.config.JHipsterProperties
-import io.jsonwebtoken.JwtException
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
-import io.jsonwebtoken.io.Decoders
-import io.jsonwebtoken.security.Keys
 
 private const val AUTHORITIES_KEY = "auth"
 
@@ -95,7 +93,6 @@ class TokenProvider(private val jHipsterProperties: JHipsterProperties) {
             log.info("Invalid JWT token.")
             log.trace("Invalid JWT token trace.", e)
         }
-
 
         return false
     }

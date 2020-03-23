@@ -1,9 +1,7 @@
 package com.adrianbadarau.bank.products.config
 
 import com.adrianbadarau.bank.products.aop.logging.LoggingAspect
-
 import io.github.jhipster.config.JHipsterConstants
-
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy

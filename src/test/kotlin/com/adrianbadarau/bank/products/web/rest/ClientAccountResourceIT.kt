@@ -2,12 +2,15 @@ package com.adrianbadarau.bank.products.web.rest
 
 import com.adrianbadarau.bank.products.ProductsApp
 import com.adrianbadarau.bank.products.domain.ClientAccount
+import com.adrianbadarau.bank.products.domain.Product
 import com.adrianbadarau.bank.products.repository.ClientAccountRepository
 import com.adrianbadarau.bank.products.service.ClientAccountService
 import com.adrianbadarau.bank.products.web.rest.errors.ExceptionTranslator
-
+import java.math.BigDecimal
+import javax.persistence.EntityManager
 import kotlin.test.assertNotNull
-
+import org.assertj.core.api.Assertions.assertThat
+import org.hamcrest.Matchers.hasItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.MockitoAnnotations
@@ -17,14 +20,6 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver
 import org.springframework.http.MediaType
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.transaction.annotation.Transactional
-import org.springframework.validation.Validator
-import javax.persistence.EntityManager
-import java.math.BigDecimal
-
-import org.assertj.core.api.Assertions.assertThat
-import org.hamcrest.Matchers.hasItem
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -32,7 +27,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.validation.Validator
 
 /**
  * Integration tests for the [ClientAccountResource] REST controller.
@@ -127,7 +124,6 @@ class ClientAccountResourceIT {
         val clientAccountList = clientAccountRepository.findAll()
         assertThat(clientAccountList).hasSize(databaseSizeBeforeCreate)
     }
-
 
     @Test
     @Transactional
@@ -241,7 +237,7 @@ class ClientAccountResourceIT {
             .andExpect(jsonPath("$.[*].ballance").value(hasItem(DEFAULT_BALLANCE.toInt())))
             .andExpect(jsonPath("$.[*].userId").value(hasItem(DEFAULT_USER_ID)))
     }
-    
+
     @Test
     @Transactional
     fun getClientAccount() {
@@ -381,6 +377,16 @@ class ClientAccountResourceIT {
                 userId = DEFAULT_USER_ID
             )
 
+            // Add required entity
+            val product: Product
+            if (em.findAll(Product::class).isEmpty()) {
+                product = ProductResourceIT.createEntity(em)
+                em.persist(product)
+                em.flush()
+            } else {
+                product = em.findAll(Product::class).get(0)
+            }
+            clientAccount.type = product
             return clientAccount
         }
 
@@ -400,6 +406,16 @@ class ClientAccountResourceIT {
                 userId = UPDATED_USER_ID
             )
 
+            // Add required entity
+            val product: Product
+            if (em.findAll(Product::class).isEmpty()) {
+                product = ProductResourceIT.createUpdatedEntity(em)
+                em.persist(product)
+                em.flush()
+            } else {
+                product = em.findAll(Product::class).get(0)
+            }
+            clientAccount.type = product
             return clientAccount
         }
     }

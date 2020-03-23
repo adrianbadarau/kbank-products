@@ -4,7 +4,7 @@ import com.adrianbadarau.bank.products.security.USER
 import io.github.jhipster.config.JHipsterProperties
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
-
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
@@ -15,8 +15,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.util.ReflectionTestUtils
-
-import org.assertj.core.api.Assertions.assertThat
 
 class JWTFilterTest {
 
@@ -119,5 +117,4 @@ class JWTFilterTest {
         assertThat(response.status).isEqualTo(HttpStatus.OK.value())
         assertThat(SecurityContextHolder.getContext().authentication).isNull()
     }
-
 }

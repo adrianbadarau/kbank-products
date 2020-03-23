@@ -1,7 +1,6 @@
 package com.adrianbadarau.bank.products.config.audit
 
 import com.adrianbadarau.bank.products.domain.PersistentAuditEvent
-
 import org.springframework.boot.actuate.audit.AuditEvent
 import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.stereotype.Component

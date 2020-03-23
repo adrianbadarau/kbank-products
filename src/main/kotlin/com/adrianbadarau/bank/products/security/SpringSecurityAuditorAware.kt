@@ -1,9 +1,7 @@
 package com.adrianbadarau.bank.products.security
 
 import com.adrianbadarau.bank.products.config.SYSTEM_ACCOUNT
-
 import java.util.Optional
-
 import org.springframework.data.domain.AuditorAware
 import org.springframework.stereotype.Component
 

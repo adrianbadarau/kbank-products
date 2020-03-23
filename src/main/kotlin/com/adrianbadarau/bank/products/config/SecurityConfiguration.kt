@@ -3,10 +3,7 @@ package com.adrianbadarau.bank.products.config
 import com.adrianbadarau.bank.products.security.ADMIN
 import com.adrianbadarau.bank.products.security.jwt.JWTConfigurer
 import com.adrianbadarau.bank.products.security.jwt.TokenProvider
-
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
-import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
@@ -26,7 +23,7 @@ class SecurityConfiguration(
 
     override fun configure(web: WebSecurity?) {
         web!!.ignoring()
-            .antMatchers("/h2-console/**");
+            .antMatchers("/h2-console/**")
     }
 
     @Throws(Exception::class)

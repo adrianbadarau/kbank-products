@@ -6,22 +6,18 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import java.io.IOException
+import java.time.ZonedDateTime
+import java.time.format.DateTimeParseException
+import javax.persistence.EntityManager
+import kotlin.reflect.KClass
+import kotlin.reflect.full.createInstance
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Description
 import org.hamcrest.TypeSafeDiagnosingMatcher
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar
 import org.springframework.format.support.DefaultFormattingConversionService
 import org.springframework.format.support.FormattingConversionService
-
-import javax.persistence.EntityManager
-
-import java.io.IOException
-import java.time.ZonedDateTime
-import java.time.format.DateTimeParseException
-
-import kotlin.reflect.KClass
-import kotlin.reflect.full.createInstance
-
-import org.assertj.core.api.Assertions.assertThat
 
 private val mapper = createObjectMapper()
 
@@ -124,6 +120,5 @@ fun <T : Any> EntityManager.findAll(clazz: KClass<T>): List<T> {
     val all = cq.select(rootEntry)
     return this.createQuery(all).resultList
 }
-
 
 const val TEST_USER_LOGIN = "test"

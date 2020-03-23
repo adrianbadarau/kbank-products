@@ -1,11 +1,5 @@
-id;customer_id;iban;name;ballance;user_id
-1;withdrawal cohesive Buckinghamshire;JO52AUCS0061002005007080040020;incentivize communities evolve;51924;41949
-2;Northern Mariana Islands Investment Account;IS352003277819638062429679;connect regional Home Loan Account;5680;95451
-3;initiatives National Credit Card Account;LV51AMFLT6501Z7233P8Z;application solution-oriented solid state;6223;39644
-4;Frozen Table Unbranded;GB68ACUM18112400940038;leading-edge Buckinghamshire North Carolina;96357;97277
-5;Soft complexity;MT74TKYZ010388XA39R6T2596OG2J96;pink withdrawal;3896;61415
-6;Wooden XSS;PK560Y1S1620759700500345;Interactions California Burundi Franc;68298;47037
-7;Specialist Intelligent Concrete Sausages reboot;KZ530099577G10235374;sticky bandwidth;13662;58149
-8;withdrawal gold;MK69115NQV4836SU473;Fantastic Intelligent Steel Towels;80028;61852
-9;New Taiwan Dollar auxiliary budgetary management;ME12921400998280053080;ROI hard drive;34464;82471
-10;Accountability Inlet Borders;ME71806030528090410404;Borders;11547;17693
+id;customer_id;iban;name;ballance;user_id;type_id
+1;cust1_EXTERNAL;JO52AUCS0061002005007080040020;incentivize communities evolve;51924;4;1
+2;cust2_EXTERNAL;IS352003277819638062429679;connect regional Home Loan Account;5680;5;2
+3;cust3_EXTERNAL;LV51AMFLT6501Z7233P8Z;application solution-oriented solid state;6223;6;3
+

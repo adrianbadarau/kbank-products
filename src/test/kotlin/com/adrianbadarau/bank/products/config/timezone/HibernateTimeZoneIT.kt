@@ -3,14 +3,7 @@ package com.adrianbadarau.bank.products.config.timezone
 import com.adrianbadarau.bank.products.ProductsApp
 import com.adrianbadarau.bank.products.repository.timezone.DateTimeWrapper
 import com.adrianbadarau.bank.products.repository.timezone.DateTimeWrapperRepository
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.support.rowset.SqlRowSet
-import org.springframework.transaction.annotation.Transactional
-
+import java.lang.String.format
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -21,9 +14,14 @@ import java.time.OffsetTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-
-import java.lang.String.format
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.support.rowset.SqlRowSet
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Integration tests for the UTC Hibernate configuration.
@@ -171,7 +169,8 @@ class HibernateTimeZoneIT {
         format("SELECT %s FROM jhi_date_time_wrapper where id=%d", fieldName, id)
 
     private fun assertThatDateStoredValueIsEqualToInsertDateValueOnGMTTimeZone(
-        sqlRowSet: SqlRowSet, expectedValue: String?
+        sqlRowSet: SqlRowSet,
+        expectedValue: String?
     ) {
         while (sqlRowSet.next()) {
             val dbValue = sqlRowSet.getString(1)

@@ -2,7 +2,6 @@ package com.adrianbadarau.bank.products.repository
 
 import com.adrianbadarau.bank.products.domain.ClientAccount
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 /**
@@ -10,5 +9,4 @@ import org.springframework.stereotype.Repository
  */
 @Suppress("unused")
 @Repository
-interface ClientAccountRepository : JpaRepository<ClientAccount, Long> {
-}
+interface ClientAccountRepository : JpaRepository<ClientAccount, Long>

@@ -18,16 +18,7 @@
             "fieldTypeBlobContent": "image"
         }
     ],
-    "relationships": [
-        {
-            "relationshipType": "many-to-one",
-            "otherEntityName": "clientAccount",
-            "otherEntityRelationshipName": "product",
-            "relationshipValidateRules": "required",
-            "relationshipName": "type",
-            "otherEntityField": "name"
-        }
-    ],
+    "relationships": [],
     "changelogDate": "20200323185300",
     "entityTableName": "product",
     "dto": "no",

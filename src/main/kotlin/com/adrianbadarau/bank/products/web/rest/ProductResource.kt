@@ -3,16 +3,15 @@ package com.adrianbadarau.bank.products.web.rest
 import com.adrianbadarau.bank.products.domain.Product
 import com.adrianbadarau.bank.products.service.ProductService
 import com.adrianbadarau.bank.products.web.rest.errors.BadRequestAlertException
-
 import io.github.jhipster.web.util.HeaderUtil
 import io.github.jhipster.web.util.PaginationUtil
 import io.github.jhipster.web.util.ResponseUtil
+import java.net.URI
+import java.net.URISyntaxException
+import javax.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.http.HttpStatus
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -21,12 +20,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-
-import javax.validation.Valid
-import java.net.URI
-import java.net.URISyntaxException
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 private const val ENTITY_NAME = "productsProduct"
 /**
@@ -96,10 +91,10 @@ class ProductResource(
 
      * @return the [ResponseEntity] with status `200 (OK)` and the list of products in body.
      */
-    @GetMapping("/products")    
+    @GetMapping("/products")
     fun getAllProducts(
         pageable: Pageable
-    ) : ResponseEntity<MutableList<Product>> {
+    ): ResponseEntity<MutableList<Product>> {
         log.debug("REST request to get a page of Products")
         val page = productService.findAll(pageable)
         val headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page)

@@ -2,11 +2,11 @@
 
 package com.adrianbadarau.bank.products.security
 
+import java.util.Optional
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
-import java.util.Optional
 
 /**
  * Get the login of the current user.
@@ -16,11 +16,10 @@ import java.util.Optional
 fun getCurrentUserLogin(): Optional<String> =
     Optional.ofNullable(extractPrincipal(SecurityContextHolder.getContext().authentication))
 
-
 fun extractPrincipal(authentication: Authentication?): String? {
 
-    if(authentication == null) {
-        return null;
+    if (authentication == null) {
+        return null
     }
 
     return when (val principal = authentication.principal) {
@@ -29,7 +28,6 @@ fun extractPrincipal(authentication: Authentication?): String? {
         else -> null
     }
 }
-
 
 /**
  * Get the JWT of the current user.
@@ -51,7 +49,7 @@ fun isAuthenticated(): Boolean {
 
     if (authentication != null) {
         val isAnonymousUser = getAuthorities(authentication)?.none { it == ANONYMOUS }
-        if(isAnonymousUser != null) {
+        if (isAnonymousUser != null) {
             return isAnonymousUser
         }
     }
@@ -72,7 +70,7 @@ fun isCurrentUserInRole(authority: String): Boolean {
 
   if (authentication != null) {
     val isUserPresent = getAuthorities(authentication)?.any { it == authority }
-    if(isUserPresent != null) {
+    if (isUserPresent != null) {
         return isUserPresent
     }
   }
@@ -83,4 +81,3 @@ fun isCurrentUserInRole(authority: String): Boolean {
 fun getAuthorities(authentication: Authentication): List<String>? {
     return authentication.authorities.map(GrantedAuthority::getAuthority)
 }
-

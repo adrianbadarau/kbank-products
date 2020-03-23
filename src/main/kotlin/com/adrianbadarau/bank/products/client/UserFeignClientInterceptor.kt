@@ -12,5 +12,5 @@ private const val BEARER_TOKEN_TYPE = "Bearer"
 class UserFeignClientInterceptor : RequestInterceptor {
 
     override fun apply(template: RequestTemplate) =
-        getCurrentUserJWT().ifPresent { s -> template.header(AUTHORIZATION_HEADER,"$BEARER_TOKEN_TYPE $s") }
+        getCurrentUserJWT().ifPresent { s -> template.header(AUTHORIZATION_HEADER, "$BEARER_TOKEN_TYPE $s") }
 }

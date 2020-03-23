@@ -1,8 +1,8 @@
 package com.adrianbadarau.bank.products.domain
 
-import org.junit.jupiter.api.Test
-import org.assertj.core.api.Assertions.assertThat
 import com.adrianbadarau.bank.products.web.rest.equalsVerifier
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
 
 class ClientAccountTest {
 

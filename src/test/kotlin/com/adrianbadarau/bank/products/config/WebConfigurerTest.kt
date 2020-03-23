@@ -2,19 +2,14 @@ package com.adrianbadarau.bank.products.config
 
 import io.github.jhipster.config.JHipsterConstants
 import io.github.jhipster.config.JHipsterProperties
-import org.h2.server.web.WebServlet
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.springframework.http.HttpHeaders
-import org.springframework.mock.env.MockEnvironment
-import org.springframework.mock.web.MockServletContext
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-
 import javax.servlet.Filter
 import javax.servlet.FilterRegistration
 import javax.servlet.Servlet
 import javax.servlet.ServletException
 import javax.servlet.ServletRegistration
+import org.h2.server.web.WebServlet
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyString
@@ -23,10 +18,14 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.verify
+import org.springframework.http.HttpHeaders
+import org.springframework.mock.env.MockEnvironment
+import org.springframework.mock.web.MockServletContext
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 
 /**
@@ -75,7 +74,6 @@ class WebConfigurerTest {
         verify(servletContext)
             .addServlet(ArgumentMatchers.eq("H2Console"), any(WebServlet::class.java))
     }
-
 
     @Test
     @Throws(Exception::class)
