@@ -2,12 +2,25 @@ package com.adrianbadarau.bank.products.service
 
 import com.adrianbadarau.bank.products.domain.ClientAccount
 import com.adrianbadarau.bank.products.repository.ClientAccountRepository
+import com.adrianbadarau.bank.products.client.TransactionsClient
+import com.adrianbadarau.bank.transactions.domain.Transaction
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import java.util.Optional
 import org.slf4j.LoggerFactory
+import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.cloud.client.discovery.DiscoveryClient
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
+import javax.servlet.http.HttpServletRequest
 
 /**
  * Service Implementation for managing [ClientAccount].
@@ -15,10 +28,15 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class ClientAccountService(
-    private val clientAccountRepository: ClientAccountRepository
+    private val clientAccountRepository: ClientAccountRepository,
+    private val templateBuilder: RestTemplateBuilder,
+    private val discoveryClient: DiscoveryClient,
+    private val request: HttpServletRequest,
+    private val transactionsClient: TransactionsClient
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
+    private val restTemplate = templateBuilder.build()
 
     /**
      * Save a clientAccount.
@@ -28,8 +46,14 @@ class ClientAccountService(
      */
     fun save(clientAccount: ClientAccount): ClientAccount {
         log.debug("Request to save ClientAccount : {}", clientAccount)
-        clientAccount.ballance = if (clientAccount.id == null && clientAccount.initialCredit != null) clientAccount.initialCredit!! else clientAccount.ballance
-        return clientAccountRepository.save(clientAccount)
+        if (clientAccount.id == null && clientAccount.initialCredit != null) {
+            clientAccount.ballance = clientAccount.initialCredit!!
+        }
+        // we first create the account then we have to add the transaction for it
+        // @TODO modify the initial test to take into account this new situation and check for a new trasaction
+        val savedAccount =  clientAccountRepository.save(clientAccount)
+        makeCreateTransactionCall(clientAccount)
+        return savedAccount
     }
 
     /**
@@ -65,5 +89,16 @@ class ClientAccountService(
         log.debug("Request to delete ClientAccount : {}", id)
 
         clientAccountRepository.deleteById(id)
+    }
+
+    private fun makeCreateTransactionCall(account: ClientAccount): Transaction {
+        return transactionsClient.createTransaction(
+            Transaction(
+                accountId = account.customerID,
+                value = account.ballance,
+                date = Instant.now(),
+                details = "Initial credit"
+            )
+        )
     }
 }
