@@ -1,4 +1,5 @@
 package com.adrianbadarau.bank.products.service
+
 import com.adrianbadarau.bank.products.domain.ClientAccount
 import com.adrianbadarau.bank.products.repository.ClientAccountRepository
 import java.util.Optional
@@ -21,12 +22,13 @@ class ClientAccountService(
 
     /**
      * Save a clientAccount.
-     *
+     * Make sure the balance equals to the initial credit property if it's a new account, and the property exists.
      * @param clientAccount the entity to save.
      * @return the persisted entity.
      */
     fun save(clientAccount: ClientAccount): ClientAccount {
         log.debug("Request to save ClientAccount : {}", clientAccount)
+        clientAccount.ballance = if (clientAccount.id == null && clientAccount.initialCredit != null) clientAccount.initialCredit!! else clientAccount.ballance
         return clientAccountRepository.save(clientAccount)
     }
 
