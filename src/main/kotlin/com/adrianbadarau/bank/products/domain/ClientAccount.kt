@@ -5,6 +5,7 @@ import java.io.Serializable
 import java.math.BigDecimal
 import javax.persistence.*
 import javax.validation.constraints.*
+import kotlin.jvm.Transient
 import org.hibernate.annotations.Cache
 import org.hibernate.annotations.CacheConcurrencyStrategy
 
@@ -32,7 +33,7 @@ data class ClientAccount(
 
     @get: NotNull
     @Column(name = "ballance", precision = 21, scale = 2, nullable = false)
-    var ballance: BigDecimal? = null,
+    var ballance: BigDecimal = BigDecimal.ZERO,
 
     @get: NotNull
     @Column(name = "user_id", nullable = false)
@@ -40,7 +41,10 @@ data class ClientAccount(
 
     @ManyToOne(optional = false) @NotNull
     @JsonIgnoreProperties("clientAccounts")
-    var type: Product? = null
+    var type: Product? = null,
+
+    @Transient
+    var initialCredit: BigDecimal? = null
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
 ) : Serializable {
@@ -62,6 +66,7 @@ data class ClientAccount(
         ", name='$name'" +
         ", ballance=$ballance" +
         ", userId=$userId" +
+        ", initialCredit=$initialCredit" +
         "}"
 
     companion object {

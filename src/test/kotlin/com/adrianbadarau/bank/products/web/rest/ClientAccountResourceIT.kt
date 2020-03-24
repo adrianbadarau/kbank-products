@@ -104,6 +104,29 @@ class ClientAccountResourceIT {
         assertThat(testClientAccount.ballance).isEqualTo(DEFAULT_BALLANCE)
         assertThat(testClientAccount.userId).isEqualTo(DEFAULT_USER_ID)
     }
+    @Test
+    @Transactional
+    @Throws(Exception::class)
+    fun createClientAccountWithInitialCredit() {
+        val databaseSizeBeforeCreate = clientAccountRepository.findAll().size
+        clientAccount.initialCredit = BigDecimal.TEN
+        // Create the ClientAccount
+        restClientAccountMockMvc.perform(
+            post("/api/client-accounts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(convertObjectToJsonBytes(clientAccount))
+        ).andExpect(status().isCreated)
+
+        // Validate the ClientAccount in the database
+        val clientAccountList = clientAccountRepository.findAll()
+        assertThat(clientAccountList).hasSize(databaseSizeBeforeCreate + 1)
+        val testClientAccount = clientAccountList[clientAccountList.size - 1]
+        assertThat(testClientAccount.customerID).isEqualTo(DEFAULT_CUSTOMER_ID)
+        assertThat(testClientAccount.iban).isEqualTo(DEFAULT_IBAN)
+        assertThat(testClientAccount.name).isEqualTo(DEFAULT_NAME)
+        assertThat(testClientAccount.ballance).isEqualTo(BigDecimal.TEN)
+        assertThat(testClientAccount.userId).isEqualTo(DEFAULT_USER_ID)
+    }
 
     @Test
     @Transactional
@@ -169,25 +192,6 @@ class ClientAccountResourceIT {
         val databaseSizeBeforeTest = clientAccountRepository.findAll().size
         // set the field null
         clientAccount.name = null
-
-        // Create the ClientAccount, which fails.
-
-        restClientAccountMockMvc.perform(
-            post("/api/client-accounts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonBytes(clientAccount))
-        ).andExpect(status().isBadRequest)
-
-        val clientAccountList = clientAccountRepository.findAll()
-        assertThat(clientAccountList).hasSize(databaseSizeBeforeTest)
-    }
-
-    @Test
-    @Transactional
-    fun checkBallanceIsRequired() {
-        val databaseSizeBeforeTest = clientAccountRepository.findAll().size
-        // set the field null
-        clientAccount.ballance = null
 
         // Create the ClientAccount, which fails.
 
@@ -355,7 +359,7 @@ class ClientAccountResourceIT {
         private const val DEFAULT_NAME = "AAAAAAAAAA"
         private const val UPDATED_NAME = "BBBBBBBBBB"
 
-        private val DEFAULT_BALLANCE: BigDecimal = BigDecimal(1)
+        private val DEFAULT_BALLANCE: BigDecimal = BigDecimal.ZERO
         private val UPDATED_BALLANCE: BigDecimal = BigDecimal(2)
 
         private const val DEFAULT_USER_ID: Int = 1
