@@ -29,14 +29,10 @@ import javax.servlet.http.HttpServletRequest
 @Transactional
 class ClientAccountService(
     private val clientAccountRepository: ClientAccountRepository,
-    private val templateBuilder: RestTemplateBuilder,
-    private val discoveryClient: DiscoveryClient,
-    private val request: HttpServletRequest,
     private val transactionsClient: TransactionsClient
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
-    private val restTemplate = templateBuilder.build()
 
     /**
      * Save a clientAccount.
