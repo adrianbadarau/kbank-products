@@ -1,11 +1,17 @@
 package com.adrianbadarau.bank.products.web.rest
 
 import com.adrianbadarau.bank.products.ProductsApp
+import com.adrianbadarau.bank.products.client.TransactionsClient
 import com.adrianbadarau.bank.products.domain.ClientAccount
 import com.adrianbadarau.bank.products.domain.Product
 import com.adrianbadarau.bank.products.repository.ClientAccountRepository
 import com.adrianbadarau.bank.products.service.ClientAccountService
 import com.adrianbadarau.bank.products.web.rest.errors.ExceptionTranslator
+import com.adrianbadarau.bank.transactions.domain.Transaction
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.given
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import java.math.BigDecimal
 import javax.persistence.EntityManager
 import kotlin.test.assertNotNull
@@ -13,9 +19,11 @@ import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.hasItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver
 import org.springframework.http.MediaType
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
@@ -30,6 +38,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.Validator
+import java.time.Instant
 
 /**
  * Integration tests for the [ClientAccountResource] REST controller.
@@ -41,6 +50,9 @@ class ClientAccountResourceIT {
 
     @Autowired
     private lateinit var clientAccountRepository: ClientAccountRepository
+
+    @MockBean
+    private lateinit var transactionsClient: TransactionsClient
 
     @Autowired
     private lateinit var clientAccountService: ClientAccountService
@@ -104,12 +116,17 @@ class ClientAccountResourceIT {
         assertThat(testClientAccount.ballance).isEqualTo(DEFAULT_BALLANCE)
         assertThat(testClientAccount.userId).isEqualTo(DEFAULT_USER_ID)
     }
+
     @Test
     @Transactional
     @Throws(Exception::class)
     fun createClientAccountWithInitialCredit() {
         val databaseSizeBeforeCreate = clientAccountRepository.findAll().size
         clientAccount.initialCredit = BigDecimal.TEN
+        val transaction = Transaction(id = 1, accountId = clientAccount.customerID, value = clientAccount.initialCredit, date = Instant.now(), details = "Initial credit")
+        // We mock the transaction service call so that our test can still work
+        given(transactionsClient.createTransaction(any())).willReturn(transaction)
+
         // Create the ClientAccount
         restClientAccountMockMvc.perform(
             post("/api/client-accounts")
@@ -270,6 +287,7 @@ class ClientAccountResourceIT {
         restClientAccountMockMvc.perform(get("/api/client-accounts/{id}", Long.MAX_VALUE))
             .andExpect(status().isNotFound)
     }
+
     @Test
     @Transactional
     fun updateClientAccount() {

@@ -12,11 +12,13 @@ import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient
+import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.core.env.Environment
 
 @SpringBootApplication
 @EnableConfigurationProperties(LiquibaseProperties::class, ApplicationProperties::class)
 @EnableDiscoveryClient
+@EnableFeignClients
 class ProductsApp(private val env: Environment) {
 
     private val log = LoggerFactory.getLogger(javaClass)
