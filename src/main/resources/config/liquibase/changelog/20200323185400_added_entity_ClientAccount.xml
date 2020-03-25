@@ -13,7 +13,7 @@
     -->
     <changeSet id="20200323185400-1" author="jhipster">
         <createTable tableName="client_account">
-            <column name="id" type="bigint" autoIncrement="${autoIncrement}">
+            <column name="id" type="varchar(36)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="customer_id" type="varchar(255)">
@@ -28,7 +28,7 @@
             <column name="ballance" type="decimal(21,2)">
                 <constraints nullable="false" />
             </column>
-            <column name="user_id" type="integer">
+            <column name="user" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
             <column name="type_id" type="bigint">

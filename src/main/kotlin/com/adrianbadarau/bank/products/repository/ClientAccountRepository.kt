@@ -9,4 +9,4 @@ import org.springframework.stereotype.Repository
  */
 @Suppress("unused")
 @Repository
-interface ClientAccountRepository : JpaRepository<ClientAccount, Long>
+interface ClientAccountRepository : JpaRepository<ClientAccount, String>

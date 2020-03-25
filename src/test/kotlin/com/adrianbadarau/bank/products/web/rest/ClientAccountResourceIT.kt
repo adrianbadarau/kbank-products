@@ -5,6 +5,8 @@ import com.adrianbadarau.bank.products.client.TransactionsClient
 import com.adrianbadarau.bank.products.domain.ClientAccount
 import com.adrianbadarau.bank.products.domain.Product
 import com.adrianbadarau.bank.products.repository.ClientAccountRepository
+import com.adrianbadarau.bank.products.security.SecurityUtilsUnitTest
+import com.adrianbadarau.bank.products.security.getCurrentUserLogin
 import com.adrianbadarau.bank.products.service.ClientAccountService
 import com.adrianbadarau.bank.products.web.rest.errors.ExceptionTranslator
 import com.adrianbadarau.bank.transactions.domain.Transaction
@@ -19,6 +21,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.hasItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,6 +30,8 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver
 import org.springframework.http.MediaType
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -39,6 +44,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.Validator
 import java.time.Instant
+import java.util.*
 
 /**
  * Integration tests for the [ClientAccountResource] REST controller.
@@ -86,6 +92,10 @@ class ClientAccountResourceIT {
             .setConversionService(createFormattingConversionService())
             .setMessageConverters(jacksonMessageConverter)
             .setValidator(validator).build()
+
+        val securityContext = SecurityContextHolder.createEmptyContext()
+        securityContext.authentication = UsernamePasswordAuthenticationToken(DEFAULT_USER_ID, DEFAULT_USER_ID)
+        SecurityContextHolder.setContext(securityContext)
     }
 
     @BeforeEach
@@ -97,6 +107,8 @@ class ClientAccountResourceIT {
     @Transactional
     @Throws(Exception::class)
     fun createClientAccount() {
+        val securityContext = SecurityContextHolder.createEmptyContext()
+        securityContext.authentication = UsernamePasswordAuthenticationToken(DEFAULT_USER_ID, DEFAULT_USER_ID)
         val databaseSizeBeforeCreate = clientAccountRepository.findAll().size
 
         // Create the ClientAccount
@@ -114,7 +126,7 @@ class ClientAccountResourceIT {
         assertThat(testClientAccount.iban).isEqualTo(DEFAULT_IBAN)
         assertThat(testClientAccount.name).isEqualTo(DEFAULT_NAME)
         assertThat(testClientAccount.ballance).isEqualTo(DEFAULT_BALLANCE)
-        assertThat(testClientAccount.userId).isEqualTo(DEFAULT_USER_ID)
+        assertThat(testClientAccount.user).isEqualTo(DEFAULT_USER_ID)
     }
 
     @Test
@@ -126,6 +138,7 @@ class ClientAccountResourceIT {
         val transaction = Transaction(id = 1, accountId = clientAccount.customerID, value = clientAccount.initialCredit, date = Instant.now(), details = "Initial credit")
         // We mock the transaction service call so that our test can still work
         given(transactionsClient.createTransaction(any())).willReturn(transaction)
+
 
         // Create the ClientAccount
         restClientAccountMockMvc.perform(
@@ -142,7 +155,7 @@ class ClientAccountResourceIT {
         assertThat(testClientAccount.iban).isEqualTo(DEFAULT_IBAN)
         assertThat(testClientAccount.name).isEqualTo(DEFAULT_NAME)
         assertThat(testClientAccount.ballance).isEqualTo(BigDecimal.TEN)
-        assertThat(testClientAccount.userId).isEqualTo(DEFAULT_USER_ID)
+        assertThat(testClientAccount.user).isEqualTo(DEFAULT_USER_ID)
     }
 
     @Test
@@ -151,7 +164,7 @@ class ClientAccountResourceIT {
         val databaseSizeBeforeCreate = clientAccountRepository.findAll().size
 
         // Create the ClientAccount with an existing ID
-        clientAccount.id = 1L
+        clientAccount.id = "b204d55b-b3cb-408a-a6c4-0ddb0b685848"
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restClientAccountMockMvc.perform(
@@ -224,10 +237,10 @@ class ClientAccountResourceIT {
 
     @Test
     @Transactional
-    fun checkUserIdIsRequired() {
+    fun checkUserIsRequired() {
         val databaseSizeBeforeTest = clientAccountRepository.findAll().size
         // set the field null
-        clientAccount.userId = null
+        clientAccount.user = null
 
         // Create the ClientAccount, which fails.
 
@@ -306,7 +319,7 @@ class ClientAccountResourceIT {
         updatedClientAccount.iban = UPDATED_IBAN
         updatedClientAccount.name = UPDATED_NAME
         updatedClientAccount.ballance = UPDATED_BALLANCE
-        updatedClientAccount.userId = UPDATED_USER_ID
+        updatedClientAccount.user = UPDATED_USER_ID
 
         restClientAccountMockMvc.perform(
             put("/api/client-accounts")
@@ -322,7 +335,7 @@ class ClientAccountResourceIT {
         assertThat(testClientAccount.iban).isEqualTo(UPDATED_IBAN)
         assertThat(testClientAccount.name).isEqualTo(UPDATED_NAME)
         assertThat(testClientAccount.ballance).isEqualTo(UPDATED_BALLANCE)
-        assertThat(testClientAccount.userId).isEqualTo(UPDATED_USER_ID)
+        assertThat(testClientAccount.user).isEqualTo(UPDATED_USER_ID)
     }
 
     @Test
@@ -380,8 +393,8 @@ class ClientAccountResourceIT {
         private val DEFAULT_BALLANCE: BigDecimal = BigDecimal.ZERO
         private val UPDATED_BALLANCE: BigDecimal = BigDecimal(2)
 
-        private const val DEFAULT_USER_ID: Int = 1
-        private const val UPDATED_USER_ID: Int = 2
+        private const val DEFAULT_USER_ID: String = "user"
+        private const val UPDATED_USER_ID: String = "user2"
 
         /**
          * Create an entity for this test.
@@ -396,7 +409,7 @@ class ClientAccountResourceIT {
                 iban = DEFAULT_IBAN,
                 name = DEFAULT_NAME,
                 ballance = DEFAULT_BALLANCE,
-                userId = DEFAULT_USER_ID
+                user = DEFAULT_USER_ID
             )
 
             // Add required entity
@@ -425,7 +438,7 @@ class ClientAccountResourceIT {
                 iban = UPDATED_IBAN,
                 name = UPDATED_NAME,
                 ballance = UPDATED_BALLANCE,
-                userId = UPDATED_USER_ID
+                user = UPDATED_USER_ID
             )
 
             // Add required entity
