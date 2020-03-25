@@ -1,5 +1,4 @@
-id;customer_id;iban;name;ballance;user_id;type_id
+id;customer_id;iban;name;ballance;user;type_id
 7f8a9611-4111-4981-a791-9de42f25ecb8;cust1_EXTERNAL;JO52AUCS0061002005007080040020;incentivize communities evolve;51924;user;1
 b4f12939-905e-4cfc-8bd8-7c4d304499c5;cust2_EXTERNAL;IS352003277819638062429679;connect regional Home Loan Account;5680;user;2
 feb28591-b10f-4506-b8d0-ed6cddf74c4f;cust3_EXTERNAL;LV51AMFLT6501Z7233P8Z;application solution-oriented solid state;6223;user;3
-
