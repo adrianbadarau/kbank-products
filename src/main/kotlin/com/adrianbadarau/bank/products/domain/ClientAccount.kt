@@ -8,6 +8,7 @@ import javax.validation.constraints.*
 import kotlin.jvm.Transient
 import org.hibernate.annotations.Cache
 import org.hibernate.annotations.CacheConcurrencyStrategy
+import org.hibernate.annotations.GenericGenerator
 
 /**
  * A ClientAccount.
@@ -17,8 +18,9 @@ import org.hibernate.annotations.CacheConcurrencyStrategy
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 data class ClientAccount(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    var id: String? = null,
     @get: NotNull
     @Column(name = "customer_id", nullable = false)
     var customerID: String? = null,
@@ -36,8 +38,8 @@ data class ClientAccount(
     var ballance: BigDecimal = BigDecimal.ZERO,
 
     @get: NotNull
-    @Column(name = "user_id", nullable = false)
-    var userId: Int? = null,
+    @Column(name = "user", nullable = false)
+    var user: String? = null,
 
     @ManyToOne(optional = false) @NotNull
     @JsonIgnoreProperties("clientAccounts")
@@ -65,7 +67,7 @@ data class ClientAccount(
         ", iban='$iban'" +
         ", name='$name'" +
         ", ballance=$ballance" +
-        ", userId=$userId" +
+        ", userId=$user" +
         ", initialCredit=$initialCredit" +
         "}"
 

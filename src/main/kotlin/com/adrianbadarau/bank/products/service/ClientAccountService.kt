@@ -3,6 +3,7 @@ package com.adrianbadarau.bank.products.service
 import com.adrianbadarau.bank.products.domain.ClientAccount
 import com.adrianbadarau.bank.products.repository.ClientAccountRepository
 import com.adrianbadarau.bank.products.client.TransactionsClient
+import com.adrianbadarau.bank.products.security.getCurrentUserLogin
 import com.adrianbadarau.bank.transactions.domain.Transaction
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -19,6 +20,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal
 import java.time.Instant
 import javax.servlet.http.HttpServletRequest
 
@@ -42,13 +44,19 @@ class ClientAccountService(
      */
     fun save(clientAccount: ClientAccount): ClientAccount {
         log.debug("Request to save ClientAccount : {}", clientAccount)
-        if (clientAccount.id == null && clientAccount.initialCredit != null) {
-            clientAccount.ballance = clientAccount.initialCredit!!
+        if (clientAccount.id == null) {
+            if (clientAccount.initialCredit != null) {
+                clientAccount.ballance = clientAccount.initialCredit!!
+            }
+            // Here we can ignore the optional and go directly for the value since there is no way a user that is not
+            // logged in can get to this point
+            clientAccount.user = getCurrentUserLogin().get()
         }
         // we first create the account then we have to add the transaction for it
-        // @TODO modify the initial test to take into account this new situation and check for a new trasaction
-        val savedAccount =  clientAccountRepository.save(clientAccount)
-        makeCreateTransactionCall(clientAccount)
+        val savedAccount = clientAccountRepository.save(clientAccount)
+        if (clientAccount.initialCredit != null && clientAccount.initialCredit!! > BigDecimal.ZERO) {
+            makeCreateTransactionCall(clientAccount)
+        }
         return savedAccount
     }
 
@@ -71,7 +79,7 @@ class ClientAccountService(
      * @return the entity.
      */
     @Transactional(readOnly = true)
-    fun findOne(id: Long): Optional<ClientAccount> {
+    fun findOne(id: String): Optional<ClientAccount> {
         log.debug("Request to get ClientAccount : {}", id)
         return clientAccountRepository.findById(id)
     }
@@ -81,7 +89,7 @@ class ClientAccountService(
      *
      * @param id the id of the entity.
      */
-    fun delete(id: Long) {
+    fun delete(id: String) {
         log.debug("Request to delete ClientAccount : {}", id)
 
         clientAccountRepository.deleteById(id)

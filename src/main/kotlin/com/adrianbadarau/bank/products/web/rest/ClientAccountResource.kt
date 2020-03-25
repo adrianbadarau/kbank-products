@@ -1,6 +1,7 @@
 package com.adrianbadarau.bank.products.web.rest
 
 import com.adrianbadarau.bank.products.domain.ClientAccount
+import com.adrianbadarau.bank.products.security.getCurrentUserLogin
 import com.adrianbadarau.bank.products.service.ClientAccountService
 import com.adrianbadarau.bank.products.web.rest.errors.BadRequestAlertException
 import io.github.jhipster.web.util.HeaderUtil
@@ -96,6 +97,9 @@ class ClientAccountResource(
         pageable: Pageable
     ): ResponseEntity<MutableList<ClientAccount>> {
         log.debug("REST request to get a page of ClientAccounts")
+        getCurrentUserLogin().ifPresent {
+            log.debug(it)
+        }
         val page = clientAccountService.findAll(pageable)
         val headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page)
         return ResponseEntity.ok().headers(headers).body(page.content)
@@ -108,7 +112,7 @@ class ClientAccountResource(
      * @return the [ResponseEntity] with status `200 (OK)` and with body the clientAccount, or with status `404 (Not Found)`.
      */
     @GetMapping("/client-accounts/{id}")
-    fun getClientAccount(@PathVariable id: Long): ResponseEntity<ClientAccount> {
+    fun getClientAccount(@PathVariable id: String): ResponseEntity<ClientAccount> {
         log.debug("REST request to get ClientAccount : {}", id)
         val clientAccount = clientAccountService.findOne(id)
         return ResponseUtil.wrapOrNotFound(clientAccount)
@@ -120,7 +124,7 @@ class ClientAccountResource(
      * @return the [ResponseEntity] with status `204 (NO_CONTENT)`.
      */
     @DeleteMapping("/client-accounts/{id}")
-    fun deleteClientAccount(@PathVariable id: Long): ResponseEntity<Void> {
+    fun deleteClientAccount(@PathVariable id: String): ResponseEntity<Void> {
         log.debug("REST request to delete ClientAccount : {}", id)
         clientAccountService.delete(id)
         return ResponseEntity.noContent()

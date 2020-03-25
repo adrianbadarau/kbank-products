@@ -46,15 +46,17 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:h2:file:./target/h2db/db/products;DB_CLOSE_DELAY=-1
-    username: products
+    url: jdbc:mysql://localhost:3306/products?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    username: root
     password:
     hikari:
       poolName: Hikari
       auto-commit: false
-  h2:
-    console:
-      enabled: false
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
   jpa:
     show-sql: true
     properties:
