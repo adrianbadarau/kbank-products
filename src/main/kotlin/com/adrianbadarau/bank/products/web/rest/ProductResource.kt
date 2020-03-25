@@ -1,6 +1,7 @@
 package com.adrianbadarau.bank.products.web.rest
 
 import com.adrianbadarau.bank.products.domain.Product
+import com.adrianbadarau.bank.products.security.isCurrentUserInRole
 import com.adrianbadarau.bank.products.service.ProductService
 import com.adrianbadarau.bank.products.web.rest.errors.BadRequestAlertException
 import io.github.jhipster.web.util.HeaderUtil
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -45,8 +47,12 @@ class ProductResource(
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/products")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     fun createProduct(@Valid @RequestBody product: Product): ResponseEntity<Product> {
         log.debug("REST request to save Product : {}", product)
+//        if (!isCurrentUserInRole("ROLE_ADMIN")){
+//            throw Error("User is not admin")
+//        }
         if (product.id != null) {
             throw BadRequestAlertException(
                 "A new product cannot already have an ID",
@@ -69,6 +75,7 @@ class ProductResource(
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/products")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     fun updateProduct(@Valid @RequestBody product: Product): ResponseEntity<Product> {
         log.debug("REST request to update Product : {}", product)
         if (product.id == null) {
@@ -120,6 +127,7 @@ class ProductResource(
      * @return the [ResponseEntity] with status `204 (NO_CONTENT)`.
      */
     @DeleteMapping("/products/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     fun deleteProduct(@PathVariable id: Long): ResponseEntity<Void> {
         log.debug("REST request to delete Product : {}", id)
         productService.delete(id)
