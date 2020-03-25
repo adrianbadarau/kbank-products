@@ -50,9 +50,6 @@ class ProductResource(
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     fun createProduct(@Valid @RequestBody product: Product): ResponseEntity<Product> {
         log.debug("REST request to save Product : {}", product)
-//        if (!isCurrentUserInRole("ROLE_ADMIN")){
-//            throw Error("User is not admin")
-//        }
         if (product.id != null) {
             throw BadRequestAlertException(
                 "A new product cannot already have an ID",
