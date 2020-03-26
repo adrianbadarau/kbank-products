@@ -122,7 +122,6 @@ class ClientAccountResourceIT {
         val clientAccountList = clientAccountRepository.findAll()
         assertThat(clientAccountList).hasSize(databaseSizeBeforeCreate + 1)
         val testClientAccount = clientAccountList[clientAccountList.size - 1]
-        assertThat(testClientAccount.customerID).isEqualTo(DEFAULT_CUSTOMER_ID)
         assertThat(testClientAccount.iban).isEqualTo(DEFAULT_IBAN)
         assertThat(testClientAccount.name).isEqualTo(DEFAULT_NAME)
         assertThat(testClientAccount.ballance).isEqualTo(DEFAULT_BALLANCE)
@@ -135,7 +134,7 @@ class ClientAccountResourceIT {
     fun createClientAccountWithInitialCredit() {
         val databaseSizeBeforeCreate = clientAccountRepository.findAll().size
         clientAccount.initialCredit = BigDecimal.TEN
-        val transaction = Transaction(id = 1, accountId = clientAccount.customerID, value = clientAccount.initialCredit, date = Instant.now(), details = "Initial credit")
+        val transaction = Transaction(id = 1, accountId = clientAccount.id, value = clientAccount.initialCredit, date = Instant.now(), details = "Initial credit")
         // We mock the transaction service call so that our test can still work
         given(transactionsClient.createTransaction(any())).willReturn(transaction)
 
@@ -151,7 +150,6 @@ class ClientAccountResourceIT {
         val clientAccountList = clientAccountRepository.findAll()
         assertThat(clientAccountList).hasSize(databaseSizeBeforeCreate + 1)
         val testClientAccount = clientAccountList[clientAccountList.size - 1]
-        assertThat(testClientAccount.customerID).isEqualTo(DEFAULT_CUSTOMER_ID)
         assertThat(testClientAccount.iban).isEqualTo(DEFAULT_IBAN)
         assertThat(testClientAccount.name).isEqualTo(DEFAULT_NAME)
         assertThat(testClientAccount.ballance).isEqualTo(BigDecimal.TEN)
@@ -178,24 +176,6 @@ class ClientAccountResourceIT {
         assertThat(clientAccountList).hasSize(databaseSizeBeforeCreate)
     }
 
-    @Test
-    @Transactional
-    fun checkCustomerIDIsRequired() {
-        val databaseSizeBeforeTest = clientAccountRepository.findAll().size
-        // set the field null
-        clientAccount.customerID = null
-
-        // Create the ClientAccount, which fails.
-
-        restClientAccountMockMvc.perform(
-            post("/api/client-accounts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonBytes(clientAccount))
-        ).andExpect(status().isBadRequest)
-
-        val clientAccountList = clientAccountRepository.findAll()
-        assertThat(clientAccountList).hasSize(databaseSizeBeforeTest)
-    }
 
     @Test
     @Transactional
@@ -265,7 +245,6 @@ class ClientAccountResourceIT {
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(clientAccount.id?.toInt())))
-            .andExpect(jsonPath("$.[*].customerID").value(hasItem(DEFAULT_CUSTOMER_ID)))
             .andExpect(jsonPath("$.[*].iban").value(hasItem(DEFAULT_IBAN)))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].ballance").value(hasItem(DEFAULT_BALLANCE.toInt())))
@@ -286,7 +265,6 @@ class ClientAccountResourceIT {
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(id.toInt()))
-            .andExpect(jsonPath("$.customerID").value(DEFAULT_CUSTOMER_ID))
             .andExpect(jsonPath("$.iban").value(DEFAULT_IBAN))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.ballance").value(DEFAULT_BALLANCE.toInt()))
@@ -315,7 +293,6 @@ class ClientAccountResourceIT {
         val updatedClientAccount = clientAccountRepository.findById(id).get()
         // Disconnect from session so that the updates on updatedClientAccount are not directly saved in db
         em.detach(updatedClientAccount)
-        updatedClientAccount.customerID = UPDATED_CUSTOMER_ID
         updatedClientAccount.iban = UPDATED_IBAN
         updatedClientAccount.name = UPDATED_NAME
         updatedClientAccount.ballance = UPDATED_BALLANCE
@@ -331,7 +308,6 @@ class ClientAccountResourceIT {
         val clientAccountList = clientAccountRepository.findAll()
         assertThat(clientAccountList).hasSize(databaseSizeBeforeUpdate)
         val testClientAccount = clientAccountList[clientAccountList.size - 1]
-        assertThat(testClientAccount.customerID).isEqualTo(UPDATED_CUSTOMER_ID)
         assertThat(testClientAccount.iban).isEqualTo(UPDATED_IBAN)
         assertThat(testClientAccount.name).isEqualTo(UPDATED_NAME)
         assertThat(testClientAccount.ballance).isEqualTo(UPDATED_BALLANCE)
@@ -381,9 +357,6 @@ class ClientAccountResourceIT {
 
     companion object {
 
-        private const val DEFAULT_CUSTOMER_ID = "AAAAAAAAAA"
-        private const val UPDATED_CUSTOMER_ID = "BBBBBBBBBB"
-
         private const val DEFAULT_IBAN = "AAAAAAAAAA"
         private const val UPDATED_IBAN = "BBBBBBBBBB"
 
@@ -405,7 +378,6 @@ class ClientAccountResourceIT {
         @JvmStatic
         fun createEntity(em: EntityManager): ClientAccount {
             val clientAccount = ClientAccount(
-                customerID = DEFAULT_CUSTOMER_ID,
                 iban = DEFAULT_IBAN,
                 name = DEFAULT_NAME,
                 ballance = DEFAULT_BALLANCE,
@@ -434,7 +406,6 @@ class ClientAccountResourceIT {
         @JvmStatic
         fun createUpdatedEntity(em: EntityManager): ClientAccount {
             val clientAccount = ClientAccount(
-                customerID = UPDATED_CUSTOMER_ID,
                 iban = UPDATED_IBAN,
                 name = UPDATED_NAME,
                 ballance = UPDATED_BALLANCE,

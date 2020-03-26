@@ -99,7 +99,7 @@ class ClientAccountService(
     private fun makeCreateTransactionCall(account: ClientAccount): Transaction {
         return transactionsClient.createTransaction(
             Transaction(
-                accountId = account.customerID,
+                accountId = account.id,
                 value = account.ballance,
                 date = Instant.now(),
                 details = "Initial credit"
