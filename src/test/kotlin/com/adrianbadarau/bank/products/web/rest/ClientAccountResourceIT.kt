@@ -5,24 +5,19 @@ import com.adrianbadarau.bank.products.client.TransactionsClient
 import com.adrianbadarau.bank.products.domain.ClientAccount
 import com.adrianbadarau.bank.products.domain.Product
 import com.adrianbadarau.bank.products.repository.ClientAccountRepository
-import com.adrianbadarau.bank.products.security.SecurityUtilsUnitTest
-import com.adrianbadarau.bank.products.security.getCurrentUserLogin
 import com.adrianbadarau.bank.products.service.ClientAccountService
+import com.adrianbadarau.bank.products.transaction_api.Transaction
 import com.adrianbadarau.bank.products.web.rest.errors.ExceptionTranslator
-import com.adrianbadarau.bank.transactions.domain.Transaction
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.given
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import java.math.BigDecimal
+import java.time.Instant
 import javax.persistence.EntityManager
 import kotlin.test.assertNotNull
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.hasItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -43,8 +38,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.Validator
-import java.time.Instant
-import java.util.*
 
 /**
  * Integration tests for the [ClientAccountResource] REST controller.
@@ -138,7 +131,6 @@ class ClientAccountResourceIT {
         // We mock the transaction service call so that our test can still work
         given(transactionsClient.createTransaction(any())).willReturn(transaction)
 
-
         // Create the ClientAccount
         restClientAccountMockMvc.perform(
             post("/api/client-accounts")
@@ -175,7 +167,6 @@ class ClientAccountResourceIT {
         val clientAccountList = clientAccountRepository.findAll()
         assertThat(clientAccountList).hasSize(databaseSizeBeforeCreate)
     }
-
 
     @Test
     @Transactional
