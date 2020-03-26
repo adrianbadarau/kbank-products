@@ -13,7 +13,4 @@ interface TransactionsClient {
     @RequestMapping(value = ["api/transactions"], method = [RequestMethod.POST])
     fun createTransaction(@RequestBody transaction: Transaction): Transaction
 
-    @RequestMapping(value = ["transactions/{accountExternalId}"], method = [RequestMethod.GET])
-    fun getAllTransactionsForAccount(@PathVariable accountExternalId: String): List<Transaction>
-
 }
