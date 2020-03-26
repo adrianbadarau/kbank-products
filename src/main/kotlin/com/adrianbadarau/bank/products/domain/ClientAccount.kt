@@ -67,7 +67,7 @@ data class ClientAccount(
         ", iban='$iban'" +
         ", name='$name'" +
         ", ballance=$ballance" +
-        ", userId=$user" +
+        ", user=$user" +
         ", initialCredit=$initialCredit" +
         "}"
 

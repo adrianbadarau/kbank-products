@@ -1,7 +1,6 @@
 package com.adrianbadarau.bank.products.web.rest
 
 import com.adrianbadarau.bank.products.domain.ClientAccount
-import com.adrianbadarau.bank.products.security.getCurrentUserLogin
 import com.adrianbadarau.bank.products.service.ClientAccountService
 import com.adrianbadarau.bank.products.web.rest.errors.BadRequestAlertException
 import io.github.jhipster.web.util.HeaderUtil
@@ -97,9 +96,6 @@ class ClientAccountResource(
         pageable: Pageable
     ): ResponseEntity<MutableList<ClientAccount>> {
         log.debug("REST request to get a page of ClientAccounts")
-        getCurrentUserLogin().ifPresent {
-            log.debug(it)
-        }
         val page = clientAccountService.findAll(pageable)
         val headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page)
         return ResponseEntity.ok().headers(headers).body(page.content)
