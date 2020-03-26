@@ -16,9 +16,6 @@
             <column name="id" type="varchar(36)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="customer_id" type="varchar(255)">
-                <constraints nullable="false" />
-            </column>
             <column name="iban" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
@@ -57,7 +54,6 @@
                   separator=";"
                   tableName="client_account">
             <column name="id" type="string"/>
-            <column name="customer_id" type="string"/>
             <column name="iban" type="string"/>
             <column name="name" type="string"/>
             <column name="ballance" type="numeric"/>

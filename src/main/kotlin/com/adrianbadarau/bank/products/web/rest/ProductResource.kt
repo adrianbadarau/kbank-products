@@ -1,7 +1,6 @@
 package com.adrianbadarau.bank.products.web.rest
 
 import com.adrianbadarau.bank.products.domain.Product
-import com.adrianbadarau.bank.products.security.isCurrentUserInRole
 import com.adrianbadarau.bank.products.service.ProductService
 import com.adrianbadarau.bank.products.web.rest.errors.BadRequestAlertException
 import io.github.jhipster.web.util.HeaderUtil

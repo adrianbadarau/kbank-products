@@ -21,9 +21,6 @@ data class ClientAccount(
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     var id: String? = null,
-    @get: NotNull
-    @Column(name = "customer_id", nullable = false)
-    var customerID: String? = null,
 
     @get: NotNull
     @Column(name = "iban", nullable = false)
@@ -63,7 +60,6 @@ data class ClientAccount(
 
     override fun toString() = "ClientAccount{" +
         "id=$id" +
-        ", customerID='$customerID'" +
         ", iban='$iban'" +
         ", name='$name'" +
         ", ballance=$ballance" +

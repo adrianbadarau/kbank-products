@@ -1,34 +1,23 @@
 package com.adrianbadarau.bank.products.service
 
+import com.adrianbadarau.bank.products.client.TransactionsClient
 import com.adrianbadarau.bank.products.domain.ClientAccount
 import com.adrianbadarau.bank.products.repository.ClientAccountRepository
-import com.adrianbadarau.bank.products.client.TransactionsClient
 import com.adrianbadarau.bank.products.security.getCurrentUserLogin
-import com.adrianbadarau.bank.transactions.domain.Transaction
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import java.util.Optional
-import org.slf4j.LoggerFactory
-import org.springframework.boot.web.client.RestTemplateBuilder
-import org.springframework.cloud.client.discovery.DiscoveryClient
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
-import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
+import com.adrianbadarau.bank.products.transaction_api.Transaction
 import java.math.BigDecimal
 import java.time.Instant
-import javax.servlet.http.HttpServletRequest
+import java.util.Optional
+import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Service Implementation for managing [ClientAccount].
  */
 @Service
-@Transactional
 class ClientAccountService(
     private val clientAccountRepository: ClientAccountRepository,
     private val transactionsClient: TransactionsClient
@@ -99,7 +88,7 @@ class ClientAccountService(
     private fun makeCreateTransactionCall(account: ClientAccount): Transaction {
         return transactionsClient.createTransaction(
             Transaction(
-                accountId = account.customerID,
+                accountId = account.id,
                 value = account.ballance,
                 date = Instant.now(),
                 details = "Initial credit"

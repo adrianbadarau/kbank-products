@@ -5,24 +5,19 @@ import com.adrianbadarau.bank.products.client.TransactionsClient
 import com.adrianbadarau.bank.products.domain.ClientAccount
 import com.adrianbadarau.bank.products.domain.Product
 import com.adrianbadarau.bank.products.repository.ClientAccountRepository
-import com.adrianbadarau.bank.products.security.SecurityUtilsUnitTest
-import com.adrianbadarau.bank.products.security.getCurrentUserLogin
 import com.adrianbadarau.bank.products.service.ClientAccountService
+import com.adrianbadarau.bank.products.transaction_api.Transaction
 import com.adrianbadarau.bank.products.web.rest.errors.ExceptionTranslator
-import com.adrianbadarau.bank.transactions.domain.Transaction
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.given
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import java.math.BigDecimal
+import java.time.Instant
 import javax.persistence.EntityManager
 import kotlin.test.assertNotNull
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.hasItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -43,8 +38,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.Validator
-import java.time.Instant
-import java.util.*
 
 /**
  * Integration tests for the [ClientAccountResource] REST controller.
@@ -122,7 +115,6 @@ class ClientAccountResourceIT {
         val clientAccountList = clientAccountRepository.findAll()
         assertThat(clientAccountList).hasSize(databaseSizeBeforeCreate + 1)
         val testClientAccount = clientAccountList[clientAccountList.size - 1]
-        assertThat(testClientAccount.customerID).isEqualTo(DEFAULT_CUSTOMER_ID)
         assertThat(testClientAccount.iban).isEqualTo(DEFAULT_IBAN)
         assertThat(testClientAccount.name).isEqualTo(DEFAULT_NAME)
         assertThat(testClientAccount.ballance).isEqualTo(DEFAULT_BALLANCE)
@@ -135,10 +127,9 @@ class ClientAccountResourceIT {
     fun createClientAccountWithInitialCredit() {
         val databaseSizeBeforeCreate = clientAccountRepository.findAll().size
         clientAccount.initialCredit = BigDecimal.TEN
-        val transaction = Transaction(id = 1, accountId = clientAccount.customerID, value = clientAccount.initialCredit, date = Instant.now(), details = "Initial credit")
+        val transaction = Transaction(id = 1L, accountId = clientAccount.id, value = clientAccount.initialCredit, date = Instant.now(), details = "Initial credit")
         // We mock the transaction service call so that our test can still work
         given(transactionsClient.createTransaction(any())).willReturn(transaction)
-
 
         // Create the ClientAccount
         restClientAccountMockMvc.perform(
@@ -151,7 +142,6 @@ class ClientAccountResourceIT {
         val clientAccountList = clientAccountRepository.findAll()
         assertThat(clientAccountList).hasSize(databaseSizeBeforeCreate + 1)
         val testClientAccount = clientAccountList[clientAccountList.size - 1]
-        assertThat(testClientAccount.customerID).isEqualTo(DEFAULT_CUSTOMER_ID)
         assertThat(testClientAccount.iban).isEqualTo(DEFAULT_IBAN)
         assertThat(testClientAccount.name).isEqualTo(DEFAULT_NAME)
         assertThat(testClientAccount.ballance).isEqualTo(BigDecimal.TEN)
@@ -176,25 +166,6 @@ class ClientAccountResourceIT {
         // Validate the ClientAccount in the database
         val clientAccountList = clientAccountRepository.findAll()
         assertThat(clientAccountList).hasSize(databaseSizeBeforeCreate)
-    }
-
-    @Test
-    @Transactional
-    fun checkCustomerIDIsRequired() {
-        val databaseSizeBeforeTest = clientAccountRepository.findAll().size
-        // set the field null
-        clientAccount.customerID = null
-
-        // Create the ClientAccount, which fails.
-
-        restClientAccountMockMvc.perform(
-            post("/api/client-accounts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonBytes(clientAccount))
-        ).andExpect(status().isBadRequest)
-
-        val clientAccountList = clientAccountRepository.findAll()
-        assertThat(clientAccountList).hasSize(databaseSizeBeforeTest)
     }
 
     @Test
@@ -264,12 +235,11 @@ class ClientAccountResourceIT {
         restClientAccountMockMvc.perform(get("/api/client-accounts?sort=id,desc"))
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(clientAccount.id?.toInt())))
-            .andExpect(jsonPath("$.[*].customerID").value(hasItem(DEFAULT_CUSTOMER_ID)))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(clientAccount.id)))
             .andExpect(jsonPath("$.[*].iban").value(hasItem(DEFAULT_IBAN)))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].ballance").value(hasItem(DEFAULT_BALLANCE.toInt())))
-            .andExpect(jsonPath("$.[*].userId").value(hasItem(DEFAULT_USER_ID)))
+            .andExpect(jsonPath("$.[*].user").value(hasItem(DEFAULT_USER_ID)))
     }
 
     @Test
@@ -285,12 +255,11 @@ class ClientAccountResourceIT {
         restClientAccountMockMvc.perform(get("/api/client-accounts/{id}", id))
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.id").value(id.toInt()))
-            .andExpect(jsonPath("$.customerID").value(DEFAULT_CUSTOMER_ID))
+            .andExpect(jsonPath("$.id").value(id))
             .andExpect(jsonPath("$.iban").value(DEFAULT_IBAN))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.ballance").value(DEFAULT_BALLANCE.toInt()))
-            .andExpect(jsonPath("$.userId").value(DEFAULT_USER_ID))
+            .andExpect(jsonPath("$.user").value(DEFAULT_USER_ID))
     }
 
     @Test
@@ -315,7 +284,6 @@ class ClientAccountResourceIT {
         val updatedClientAccount = clientAccountRepository.findById(id).get()
         // Disconnect from session so that the updates on updatedClientAccount are not directly saved in db
         em.detach(updatedClientAccount)
-        updatedClientAccount.customerID = UPDATED_CUSTOMER_ID
         updatedClientAccount.iban = UPDATED_IBAN
         updatedClientAccount.name = UPDATED_NAME
         updatedClientAccount.ballance = UPDATED_BALLANCE
@@ -331,7 +299,6 @@ class ClientAccountResourceIT {
         val clientAccountList = clientAccountRepository.findAll()
         assertThat(clientAccountList).hasSize(databaseSizeBeforeUpdate)
         val testClientAccount = clientAccountList[clientAccountList.size - 1]
-        assertThat(testClientAccount.customerID).isEqualTo(UPDATED_CUSTOMER_ID)
         assertThat(testClientAccount.iban).isEqualTo(UPDATED_IBAN)
         assertThat(testClientAccount.name).isEqualTo(UPDATED_NAME)
         assertThat(testClientAccount.ballance).isEqualTo(UPDATED_BALLANCE)
@@ -381,9 +348,6 @@ class ClientAccountResourceIT {
 
     companion object {
 
-        private const val DEFAULT_CUSTOMER_ID = "AAAAAAAAAA"
-        private const val UPDATED_CUSTOMER_ID = "BBBBBBBBBB"
-
         private const val DEFAULT_IBAN = "AAAAAAAAAA"
         private const val UPDATED_IBAN = "BBBBBBBBBB"
 
@@ -405,7 +369,6 @@ class ClientAccountResourceIT {
         @JvmStatic
         fun createEntity(em: EntityManager): ClientAccount {
             val clientAccount = ClientAccount(
-                customerID = DEFAULT_CUSTOMER_ID,
                 iban = DEFAULT_IBAN,
                 name = DEFAULT_NAME,
                 ballance = DEFAULT_BALLANCE,
@@ -434,7 +397,6 @@ class ClientAccountResourceIT {
         @JvmStatic
         fun createUpdatedEntity(em: EntityManager): ClientAccount {
             val clientAccount = ClientAccount(
-                customerID = UPDATED_CUSTOMER_ID,
                 iban = UPDATED_IBAN,
                 name = UPDATED_NAME,
                 ballance = UPDATED_BALLANCE,
