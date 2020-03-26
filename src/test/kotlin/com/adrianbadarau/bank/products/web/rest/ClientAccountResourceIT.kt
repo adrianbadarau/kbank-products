@@ -127,7 +127,7 @@ class ClientAccountResourceIT {
     fun createClientAccountWithInitialCredit() {
         val databaseSizeBeforeCreate = clientAccountRepository.findAll().size
         clientAccount.initialCredit = BigDecimal.TEN
-        val transaction = Transaction(id = 1, accountId = clientAccount.id, value = clientAccount.initialCredit, date = Instant.now(), details = "Initial credit")
+        val transaction = Transaction(id = 1L, accountId = clientAccount.id, value = clientAccount.initialCredit, date = Instant.now(), details = "Initial credit")
         // We mock the transaction service call so that our test can still work
         given(transactionsClient.createTransaction(any())).willReturn(transaction)
 
@@ -235,11 +235,11 @@ class ClientAccountResourceIT {
         restClientAccountMockMvc.perform(get("/api/client-accounts?sort=id,desc"))
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(clientAccount.id?.toInt())))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(clientAccount.id)))
             .andExpect(jsonPath("$.[*].iban").value(hasItem(DEFAULT_IBAN)))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].ballance").value(hasItem(DEFAULT_BALLANCE.toInt())))
-            .andExpect(jsonPath("$.[*].userId").value(hasItem(DEFAULT_USER_ID)))
+            .andExpect(jsonPath("$.[*].user").value(hasItem(DEFAULT_USER_ID)))
     }
 
     @Test
@@ -255,11 +255,11 @@ class ClientAccountResourceIT {
         restClientAccountMockMvc.perform(get("/api/client-accounts/{id}", id))
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.id").value(id.toInt()))
+            .andExpect(jsonPath("$.id").value(id))
             .andExpect(jsonPath("$.iban").value(DEFAULT_IBAN))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.ballance").value(DEFAULT_BALLANCE.toInt()))
-            .andExpect(jsonPath("$.userId").value(DEFAULT_USER_ID))
+            .andExpect(jsonPath("$.user").value(DEFAULT_USER_ID))
     }
 
     @Test
