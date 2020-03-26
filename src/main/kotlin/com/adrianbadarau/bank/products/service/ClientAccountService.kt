@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional
  * Service Implementation for managing [ClientAccount].
  */
 @Service
-@Transactional
 class ClientAccountService(
     private val clientAccountRepository: ClientAccountRepository,
     private val transactionsClient: TransactionsClient
