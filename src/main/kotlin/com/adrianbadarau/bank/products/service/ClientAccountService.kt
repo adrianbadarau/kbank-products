@@ -61,7 +61,7 @@ class ClientAccountService(
     }
 
     /**
-     * Get all the clientAccounts.
+     * Get all the clientAccounts for the current logged in user.
      *
      * @param pageable the pagination information.
      * @return the list of entities.
@@ -69,7 +69,8 @@ class ClientAccountService(
     @Transactional(readOnly = true)
     fun findAll(pageable: Pageable): Page<ClientAccount> {
         log.debug("Request to get all ClientAccounts")
-        return clientAccountRepository.findAll(pageable)
+        val user = getCurrentUserLogin().get()
+        return clientAccountRepository.findAllByUserEquals(user, pageable)
     }
 
     /**
